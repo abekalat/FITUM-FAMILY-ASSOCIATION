@@ -432,7 +432,9 @@ async function loadApprovedAnnouncements() {
   if (!display) return;
 
   try {
-    const snapshot = await getDocs(collection(db, "announcements"));
+   const snapshot = await getDocs(
+  query(collection(db, "announcements"), where("status", "==", "approved"))
+);
     display.innerHTML = "<h3>Approved Family Announcements</h3>";
 
     let approvedCount = 0;
