@@ -373,7 +373,7 @@ document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
 
  </script><script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
   import { getAuth } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -388,5 +388,40 @@ document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
-</script>
+
+const gatheringForm = document.getElementById("gatheringSubmissionForm");
+const gatheringStatus = document.getElementById("gatheringFormStatus");
+
+if (gatheringForm && gatheringStatus) {
+  gatheringForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const submitButton = gatheringForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    gatheringStatus.textContent = "Submitting your announcement...";
+
+    try {
+      await addDoc(collection(db, "announcements"), {
+        host: document.getElementById("gatheringHost").value.trim(),
+        location: document.getElementById("gatheringLocation").value.trim(),
+        date: document.getElementById("gatheringDate").value,
+        time: document.getElementById("gatheringTime").value,
+        message: document.getElementById("gatheringMessage").value.trim(),
+        status: "pending"
+      });
+
+      gatheringStatus.textContent =
+        "Thank you! Your announcement was submitted and is waiting for approval.";
+      gatheringForm.reset();
+    } catch (error) {
+      console.error("Announcement submission failed:", error);
+      gatheringStatus.textContent =
+        "Submission failed. Please try again later.";
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
+
+ </script>
 </body></html>
