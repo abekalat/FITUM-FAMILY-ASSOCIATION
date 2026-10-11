@@ -337,5 +337,22 @@ document.getElementById("calNext").addEventListener("click", () => {
 
 document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
 
- </script>
+ </script><script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjvZGW4px8BZDLwAj5AnX5b0owaMdBfoY",
+    authDomain: "fitsum-family-association.firebaseapp.com",
+    projectId: "fitsum-family-association",
+    storageBucket: "fitsum-family-association.firebasestorage.app",
+    messagingSenderId: "222842502050",
+    appId: "1:222842502050:web:11a8f61288357fb35bd0fb"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+</script>
 </body></html>
