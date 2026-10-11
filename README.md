@@ -1,4 +1,4 @@
-# Fitum Family Association Website
+# Fistum Family Association Website
 
 A responsive bilingual (English/Amharic) static website for the Fitum Family Association.
 
