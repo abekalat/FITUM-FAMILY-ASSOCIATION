@@ -1073,25 +1073,63 @@ if (privateTreeLogin && privateTreeStatus && privateTreeContent) {
       const treeSnapshot =
         await getDocs(collection(db, "familyTree"));
 
-      const list = document.createElement("ul");
+     // FAMILY TREE - BRANCH DESIGN
+const tree = document.createElement("div");
+tree.className = "real-family-tree";
 
-      treeSnapshot.forEach((memberDoc) => {
-        const data = memberDoc.data();
+const title = document.createElement("h2");
+title.textContent = "The Fitsum Family";
+tree.appendChild(title);
 
-        if (typeof data.name !== "string" ||
-            !data.name.trim()) return;
+const branches = [
+  ["Wonishet & Tadesse", "wonishet-tadesse"],
+  ["Emebet & Taye", "emebet-taye"],
+  ["Ababu & Germech", "ababu-germech"],
+  ["Fiyissa & Hargewoine", "fiyissa-hargewoine"],
+  ["Tilahun & Sisay", "tilahun-sisay"],
+  ["Getenet & Eleni", "getenet-eleni"],
+  ["Terefe & Marta", "terefe-marta"],
+  ["Zack & Betty", "zack-betty"],
+  ["Cindi & Readet", "cindi-readet"],
+  ["Hilly & Abe", "hilly-abe"],
+  ["Sami", "sami"],
+  ["Yohaness", "yohaness"]
+];
 
-        const item = document.createElement("li");
-        item.textContent = data.name;
-        list.appendChild(item);
-      });
+const branchArea = document.createElement("div");
+branchArea.className = "real-tree-branches";
 
-      if (list.children.length) {
-        privateTreeContent.appendChild(list);
-      } else {
-        privateTreeContent.textContent =
-          "The private family tree is being prepared.";
-      }
+branches.forEach(([label, branchId]) => {
+  const branch = document.createElement("div");
+  branch.className = "real-tree-branch";
+
+  const name = document.createElement("strong");
+  name.textContent = label;
+  branch.appendChild(name);
+
+  const children = document.createElement("div");
+  children.className = "real-tree-children";
+
+  treeSnapshot.forEach((memberDoc) => {
+    const data = memberDoc.data();
+
+    if (
+      data.parentId === branchId &&
+      typeof data.name === "string" &&
+      data.name.trim()
+    ) {
+      const child = document.createElement("span");
+      child.textContent = data.name;
+      children.appendChild(child);
+    }
+  });
+
+  branch.appendChild(children);
+  branchArea.appendChild(branch);
+});
+
+tree.appendChild(branchArea);
+privateTreeContent.appendChild(tree);
 
       privateTreeContent.hidden = false;
 
