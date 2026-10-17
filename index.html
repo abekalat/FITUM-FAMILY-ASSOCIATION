@@ -595,6 +595,77 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
   >
 
 </section>
+  
+<!-- FAMILY TREE NAME SUBMISSION -->
+<section class="section white" id="family-tree">
+  <div class="wrap">
+    <h2>Family Tree / የቤተሰብ የዘር ሐረግ</h2>
+
+    <p>
+      Help us grow our family tree!
+      Submit children's and grandchildren's names
+      for approval.
+    </p>
+
+    <div class="formbox">
+      <h3>Submit a Name / ስም ያስገቡ</h3>
+
+      <button type="button" id="familyGoogleLogin">
+        Sign in with Google
+      </button>
+
+      <p id="familyLoginStatus"></p>
+
+      <form id="familyNameForm">
+
+        <label for="familyMemberName">
+          Child or Grandchild Name
+        </label>
+        <input
+          type="text"
+          id="familyMemberName"
+          maxlength="100"
+          required
+        >
+
+        <label for="familyGeneration">
+          Relationship
+        </label>
+        <select id="familyGeneration" required>
+          <option value="">Choose relationship</option>
+          <option value="child">Child</option>
+          <option value="grandchild">Grandchild</option>
+        </select>
+
+        <label for="familyParentId">
+          Family Branch
+        </label>
+        <select id="familyParentId" required>
+          <option value="">Choose a family branch</option>
+          <option value="terefe-marta">Terefe &amp; Marta</option>
+          <option value="wonishet-tadesse">Wonishet &amp; Tadesse</option>
+          <option value="emebet-taye">Emebet &amp; Taye</option>
+          <option value="ababu-germech">Ababu &amp; Germech</option>
+          <option value="fiyissa-hargewoine">Fiyissa &amp; Hargewoine</option>
+          <option value="tilahun-sisay">Tilahun &amp; Sisay</option>
+          <option value="getenet-eleni">Getenet &amp; Eleni</option>
+          <option value="zack-betty">Zack &amp; Betty</option>
+          <option value="cindi-readet">Cindi &amp; Readet</option>
+          <option value="hilly-abe">Hilly &amp; Abe</option>
+          <option value="sami">Sami</option>
+        </select>
+
+        <button type="submit">
+          Submit Name for Approval
+        </button>
+      </form>
+
+      <p id="familySubmissionStatus" role="status"></p>
+    </div>
+  </div>
+</section>
+<!-- END FAMILY TREE NAME SUBMISSION -->
+
   <section class="section" id="membership"><div class="wrap two-col"><div><div class="eyebrow" data-en="Your family needs you" data-am="ቤተሰብዎ ያስፈልገዋል">Your family needs you</div><h2 data-en="Become part of Family Association." data-am="የፊጡም ቤተሰብ ማህበር አባል ይሁኑ።">Become part of Family Association.</h2><p data-en="Membership helps us keep relatives connected, coordinate events, preserve family history, and organize support for one another." data-am="አባልነት ዘመዶችን እንድናገናኝ፣ ዝግጅቶችን እንድናስተባብር፣ የቤተሰብ ታሪክን እንድንጠብቅ እና እርስ በርስ ድጋፍ እንድናደራጅ ይረዳናል።">Membership helps us keep relatives connected, coordinate events, preserve family history, and organize support for one another.</p><ul class="feature-list"><li data-en="Receive association announcements" data-am="የማህበሩን ማስታወቂያዎች ይቀበሉ">Receive association announcements</li><li data-en="Take part in family events and decisions" data-am="በቤተሰብ ዝግጅቶችና ውሳኔዎች ይሳተፉ">Take part in family events and decisions</li><li data-en="Contribute your ideas, time, and skills" data-am="ሀሳብዎን፣ ጊዜዎንና ችሎታዎን ያበርክቱ">Contribute your ideas, time, and skills</li></ul></div>
 <div class="formbox"><h3 data-en="Membership Registration" data-am="የአባልነት ምዝገባ">Membership Registration</h3><p class="formnote" data-en="Complete this form to prepare a membership request." data-am="የአባልነት ጥያቄ ለማቅረብ ይህን ቅጽ ይሙሉ።">Complete this form to prepare a membership request.</p>
 <form id="memberForm"><div class="formgrid"><div class="field"><label for="fullName" data-en="Full name *" data-am="ሙሉ ስም *">Full name *</label><input id="fullName" name="fullName" required autocomplete="name"></div><div class="field"><label for="relation" data-en="Family relationship" data-am="የቤተሰብ ግንኙነት">Family relationship</label><input id="relation" name="relation" placeholder="e.g. child, grandchild"></div><div class="field"><label for="email" data-en="Email address *" data-am="ኢሜይል *">Email address *</label><input id="email" name="email" type="email" required autocomplete="email"></div><div class="field"><label for="phone" data-en="Phone number" data-am="ስልክ ቁጥር">Phone number</label><input id="phone" name="phone" type="tel" autocomplete="tel"></div><div class="field full"><label for="city" data-en="City / Country" data-am="ከተማ / አገር">City / Country</label><input id="city" name="city" autocomplete="country-name"></div><div class="field full"><label for="message" data-en="A short message (optional)" data-am="አጭር መልዕክት (አማራጭ)">A short message (optional)</label><textarea id="message" name="message"></textarea></div><div class="field full"><button class="submit" type="submit" data-en="Prepare Registration Request" data-am="የምዝገባ ጥያቄ አዘጋጅ">Prepare Registration Request</button><p class="formnote" data-en="Demo note: this page does not send or store personal information. It will prepare an email draft for you to send to the association." data-am="ማስታወሻ፦ ይህ ገጽ የግል መረጃን አይልክም ወይም አያስቀምጥም። ለማህበሩ የሚላክ የኢሜይል ረቂቅ ያዘጋጃል።">Demo note: this page does not send or store personal information. It will prepare an email draft for you to send to the association.</p><div class="toast" id="formToast" role="status"></div></div></div></form></div></div></section>
@@ -858,6 +929,79 @@ async function loadApprovedAnnouncements() {
 }
 
 loadApprovedAnnouncements();
+
+  // FAMILY TREE NAME SUBMISSIONS
+  const familyLoginButton =
+    document.getElementById("familyGoogleLogin");
+  const familyLoginStatus =
+    document.getElementById("familyLoginStatus");
+  const familyNameForm =
+    document.getElementById("familyNameForm");
+  const familySubmissionStatus =
+    document.getElementById("familySubmissionStatus");
+
+  if (familyLoginButton && familyNameForm) {
+    familyLoginButton.addEventListener("click", async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        familyLoginStatus.textContent =
+          "Sign-in failed: " + error.message;
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      familyLoginStatus.textContent = user
+        ? "Signed in as " + (user.displayName || user.email)
+        : "Please sign in to submit a name.";
+    });
+
+    familyNameForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!auth.currentUser) {
+        familySubmissionStatus.textContent =
+          "Please sign in with Google first.";
+        return;
+      }
+
+      const name =
+        document.getElementById("familyMemberName").value.trim();
+      const parentId =
+        document.getElementById("familyParentId").value;
+      const generation =
+        document.getElementById("familyGeneration").value;
+
+      if (!name || !parentId || !generation) {
+        familySubmissionStatus.textContent =
+          "Please complete all fields.";
+        return;
+      }
+
+      const submitButton =
+        familyNameForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+
+      try {
+        await addDoc(collection(db, "familyTreeRequests"), {
+          name: name,
+          parentId: parentId,
+          status: "pending"
+        });
+
+        familySubmissionStatus.textContent =
+          "Name submitted! Waiting for administrator approval.";
+        familyNameForm.reset();
+      } catch (error) {
+        console.error(error);
+        familySubmissionStatus.textContent =
+          "Could not submit the name. Please try again.";
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  }
  </script>
 
 </body></html>
