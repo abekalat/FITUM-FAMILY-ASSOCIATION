@@ -752,8 +752,11 @@ document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
 
  </script><script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
- import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+ 
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
+  
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDjvZGW4px8BZDLwAj5AnX5b0owaMdBfoY",
