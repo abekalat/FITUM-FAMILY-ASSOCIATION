@@ -842,7 +842,9 @@ document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
  </script><script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
  
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
+import { getFirestore, collection, addDoc, getDocs, getDoc, query, where, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
 
   
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
@@ -1020,6 +1022,86 @@ loadApprovedAnnouncements();
       }
     });
   }
+/* PRIVATE FAMILY TREE - APPROVED MEMBERS ONLY */
+
+const privateTreeLogin = document.getElementById("privateTreeLogin");
+const privateTreeStatus = document.getElementById("privateTreeStatus");
+const privateTreeContent = document.getElementById("privateTreeContent");
+
+if (privateTreeLogin && privateTreeStatus && privateTreeContent) {
+
+  privateTreeLogin.addEventListener("click", async () => {
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch (error) {
+      privateTreeStatus.textContent =
+        "Sign-in failed: " + error.message;
+    }
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+
+    privateTreeContent.hidden = true;
+    privateTreeContent.replaceChildren();
+
+    if (!user) {
+      privateTreeStatus.textContent =
+        "Members Only - Please sign in with Google.";
+      privateTreeLogin.hidden = false;
+      return;
+    }
+
+    privateTreeLogin.hidden = true;
+    privateTreeStatus.textContent =
+      "Checking your family membership...";
+
+    try {
+      const memberRef = doc(db, "approvedMembers", user.uid);
+      const memberSnapshot = await getDoc(memberRef);
+
+      if (!memberSnapshot.exists() ||
+          memberSnapshot.data().approved !== true) {
+        privateTreeStatus.textContent =
+          "Your account is waiting for administrator approval.";
+        return;
+      }
+
+      privateTreeStatus.textContent =
+        "Welcome! Your family membership is approved.";
+
+      const treeSnapshot =
+        await getDocs(collection(db, "familyTree"));
+
+      const list = document.createElement("ul");
+
+      treeSnapshot.forEach((memberDoc) => {
+        const data = memberDoc.data();
+
+        if (typeof data.name !== "string" ||
+            !data.name.trim()) return;
+
+        const item = document.createElement("li");
+        item.textContent = data.name;
+        list.appendChild(item);
+      });
+
+      if (list.children.length) {
+        privateTreeContent.appendChild(list);
+      } else {
+        privateTreeContent.textContent =
+          "The private family tree is being prepared.";
+      }
+
+      privateTreeContent.hidden = false;
+
+    } catch (error) {
+      console.error(error);
+      privateTreeStatus.textContent =
+        "Unable to load your family tree. Please try again.";
+    }
+  });
+}
+
  </script>
 
 </body></html>
