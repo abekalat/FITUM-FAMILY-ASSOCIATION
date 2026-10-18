@@ -1525,6 +1525,12 @@ if (privateTreeLogin && privateTreeStatus && privateTreeContent) {
   onAuthStateChanged(auth, async (user) => {
 
     privateTreeContent.hidden = true;
+    
+const familyDocumentsSection = document.getElementById("familyDocuments");
+if (familyDocumentsSection) {
+  familyDocumentsSection.hidden = true;
+}
+
     privateTreeContent.replaceChildren();
 
     if (!user) {
@@ -1555,6 +1561,11 @@ document.getElementById("requestMembershipBtn").hidden = true;
 
       privateTreeStatus.textContent =
         "Welcome! Your family membership is approved.";
+
+const familyDocuments = document.getElementById("familyDocuments");
+if (familyDocuments) {
+  familyDocuments.hidden = false;
+}
 
       const treeSnapshot =
         await getDocs(collection(db, "familyTree"));
