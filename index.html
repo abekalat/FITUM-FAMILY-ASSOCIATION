@@ -127,7 +127,14 @@
 .topline button {
   display: none !important;
 }
-/* Hide text and buttons over Canva background */
+/* Remove extra gold outline around family banner */
+#home,
+#home::before,
+#home::after {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}/* Hide text and buttons over Canva background */
 .hero-content {
   visibility: hidden;
 }
