@@ -1023,8 +1023,6 @@ if (memberAnnouncementLogin) {
 }
 /* END ANNOUNCEMENT GOOGLE SIGN-IN */
   
-const memberAnnouncementStatus = document.getElementById("memberAnnouncementStatus");
-
 if (memberAnnouncementForm && memberAnnouncementStatus) {
   onAuthStateChanged(auth, async (user) => {
     memberAnnouncementForm.hidden = true;
