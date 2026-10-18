@@ -686,7 +686,31 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 
 </div>
 <!-- END PRIVATE FITSUM FAMILY TREE -->
+<!-- FITSUM FAMILY ADMIN APPROVAL DASHBOARD -->
+<div id="familyAdminDashboard"
+     hidden
+     style="max-width:950px;margin:25px auto;padding:25px;
+            background:#fff9e9;border:3px solid #c7a45b;
+            border-radius:15px;">
 
+  <h2 style="color:#173f35;">
+    Family Membership Approval Dashboard
+  </h2>
+
+  <p>Review family membership requests below.</p>
+
+  <button type="button" id="refreshMembershipRequests"
+          style="background:#173f35;color:white;border:0;
+                 border-radius:8px;padding:12px 20px;cursor:pointer;">
+    Refresh Requests
+  </button>
+
+  <p id="adminMembershipStatus"></p>
+
+  <div id="pendingMembershipList"></div>
+
+</div>
+<!-- END FITSUM FAMILY ADMIN DASHBOARD -->
 
 
  
@@ -942,7 +966,140 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
 // Fitsum Family Association administrator
 const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
-const gatheringForm = document.getElementById("gatheringSubmissionForm");
+// FITSUM FAMILY MEMBERSHIP APPROVAL DASHBOARD
+const adminDashboard = document.getElementById("familyAdminDashboard");
+const pendingMembershipList = document.getElementById("pendingMembershipList");
+const adminMembershipStatus = document.getElementById("adminMembershipStatus");
+const refreshMembershipRequests =
+  document.getElementById("refreshMembershipRequests");
+
+async function loadMembershipRequests() {
+  if (!auth.currentUser ||
+      auth.currentUser.uid !== FAMILY_ADMIN_UID) {
+    return;
+  }
+
+  pendingMembershipList.replaceChildren();
+  adminMembershipStatus.textContent = "Loading membership requests...";
+
+  try {
+    const snapshot = await getDocs(
+      collection(db, "membershipRequests")
+    );
+
+    const pending = snapshot.docs.filter(
+      item => item.data().status === "pending"
+    );
+
+    if (pending.length === 0) {
+      adminMembershipStatus.textContent =
+        "No pending membership requests.";
+      return;
+    }
+
+    adminMembershipStatus.textContent =
+      pending.length + " membership request(s) waiting.";
+
+    pending.forEach(item => {
+      const data = item.data();
+
+      const card = document.createElement("div");
+      card.style.cssText =
+        "background:white;border:1px solid #c7a45b;" +
+        "border-radius:10px;padding:15px;margin:12px 0;";
+
+      const member = document.createElement("p");
+      member.textContent =
+        (data.name || "Family Member") + " — " + (data.email || "");
+      card.appendChild(member);
+
+      const approveBtn = document.createElement("button");
+      approveBtn.textContent = "Approve";
+      approveBtn.style.cssText =
+        "background:#176b43;color:white;padding:10px;" +
+        "border:0;border-radius:6px;margin-right:10px;cursor:pointer;";
+
+      const rejectBtn = document.createElement("button");
+      rejectBtn.textContent = "Reject";
+      rejectBtn.style.cssText =
+        "background:#9c3535;color:white;padding:10px;" +
+        "border:0;border-radius:6px;cursor:pointer;";
+
+      approveBtn.addEventListener("click", async () => {
+        if (!confirm("Approve " + (data.name || "this member") + "?")) return;
+
+        approveBtn.disabled = true;
+        rejectBtn.disabled = true;
+
+        try {
+          await setDoc(doc(db, "approvedMembers", item.id), {
+            approved: true
+          });
+
+          await updateDoc(doc(db, "membershipRequests", item.id), {
+            status: "approved"
+          });
+
+          await loadMembershipRequests();
+        } catch (error) {
+          adminMembershipStatus.textContent =
+            "Approval failed: " + error.message;
+          approveBtn.disabled = false;
+          rejectBtn.disabled = false;
+        }
+      });
+
+      rejectBtn.addEventListener("click", async () => {
+        if (!confirm("Reject " + (data.name || "this member") + "?")) return;
+
+        approveBtn.disabled = true;
+        rejectBtn.disabled = true;
+
+        try {
+          await updateDoc(doc(db, "membershipRequests", item.id), {
+            status: "rejected"
+          });
+
+          await loadMembershipRequests();
+        } catch (error) {
+          adminMembershipStatus.textContent =
+            "Rejection failed: " + error.message;
+          approveBtn.disabled = false;
+          rejectBtn.disabled = false;
+        }
+      });
+
+      card.appendChild(approveBtn);
+      card.appendChild(rejectBtn);
+      pendingMembershipList.appendChild(card);
+    });
+  } catch (error) {
+    adminMembershipStatus.textContent =
+      "Unable to load requests: " + error.message;
+  }
+}
+
+if (adminDashboard && pendingMembershipList &&
+    adminMembershipStatus && refreshMembershipRequests) {
+
+  onAuthStateChanged(auth, user => {
+    const isAdmin =
+      user && user.uid === FAMILY_ADMIN_UID;
+
+    adminDashboard.hidden = !isAdmin;
+
+    if (isAdmin) {
+      loadMembershipRequests();
+    } else {
+      pendingMembershipList.replaceChildren();
+    }
+  });
+
+  refreshMembershipRequests.addEventListener(
+    "click", loadMembershipRequests
+  );
+}
+// END MEMBERSHIP APPROVAL DASHBOARDconst gatheringForm = document.getElementById("gatheringSubmissionForm");
 const gatheringStatus = document.getElementById("gatheringFormStatus");
 
 if (gatheringForm && gatheringStatus) {
