@@ -6,6 +6,7 @@
 
 
 
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -135,7 +136,7 @@ url("family-background.png");
   background-repeat: no-repeat !important;
 }
 
-</style>
+</style
 
 
 </head>
@@ -1175,7 +1176,75 @@ branches.forEach(([label, branchId]) => {
   const name = document.createElement("strong");
   name.textContent = label;
   branch.appendChild(name);
+// Make each family branch clickable
+branch.style.cursor = "pointer";
 
+const familyDetails = document.createElement("div");
+familyDetails.style.display = "none";
+familyDetails.style.marginTop = "12px";
+familyDetails.style.padding = "10px";
+familyDetails.style.background = "#fff9e9";
+familyDetails.style.borderRadius = "12px";
+familyDetails.style.fontSize = "14px";
+familyDetails.style.textAlign = "center";
+
+const familyMembers = {
+  "wonishet-tadesse": {
+    children: ["Marta", "Afomia", "Hiwot"]
+  },
+  "emebet-taye": {
+    children: ["Naom", "Nahomi"]
+  },
+  "ababu-germech": {
+    children: ["Emuye", "Merhawit", "Yonatan"]
+  },
+  "fiyissa-hargewoine": {
+    children: ["Tsedi", "Zack", "Ezra"]
+  },
+  "tilahun-sisay": {
+    children: ["Andi", "Ermi", "Eyob"]
+  },
+  "getenet-eleni": {
+    children: ["Child 1", "Child 2", "Child 3", "Child 4", "Child 5"]
+  },
+  "zack-betty": {
+    children: ["Nathan", "Issac", "Amilea"]
+  },
+  "cindi-readet": {
+    children: ["Noah", "Abigail", "Hazel"]
+  },
+  "hilly-abe": {
+    children: ["Bethany", "Abigail"]
+  },
+  "sami": {
+    children: ["Child 1 (name pending)"]
+  }
+};
+
+const info = familyMembers[branchId];
+
+if (info) {
+  const heading = document.createElement("strong");
+  heading.textContent = "Children";
+  familyDetails.appendChild(heading);
+
+  info.children.forEach(childName => {
+    const childBox = document.createElement("div");
+    childBox.textContent = childName;
+    childBox.style.margin = "6px 0";
+    childBox.style.padding = "6px";
+    childBox.style.background = "#e5efc8";
+    childBox.style.borderRadius = "8px";
+    familyDetails.appendChild(childBox);
+  });
+
+  branch.appendChild(familyDetails);
+
+  branch.addEventListener("click", () => {
+    familyDetails.style.display =
+      familyDetails.style.display === "none" ? "block" : "none";
+  });
+}
   const children = document.createElement("div");
   children.className = "real-tree-children";
 
