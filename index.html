@@ -662,6 +662,12 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
     </button>
   </form>
 </div>
+  
+<div id="memberAnnouncementPosts" style="margin-top:25px;">
+  <h3>Family Member Posts</h3>
+  <p>Loading family announcements...</p>
+</div>
+
 <!-- END MEMBERS-ONLY ANNOUNCEMENT BOARD -->
 <div id="approvedAnnouncements" style="margin-top:20px;">
   <h3>Approved Family Announcements</h3>
@@ -969,8 +975,7 @@ document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
  
 
-import { getFirestore, collection, addDoc, getDocs, getDoc, query, where, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
-
+import { getFirestore, collection, addDoc, getDocs, getDoc, query, where, doc, setDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
   
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
@@ -990,7 +995,73 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
 // Fitsum Family Association administrator
 const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
-// FITSUM FAMILY MEMBERSHIP APPROVAL DASHBOARD
+// MEMBERS-ONLY FAMILY ANNOUNCEMENTS
+const memberAnnouncementForm = document.getElementById("memberAnnouncementForm");
+const memberAnnouncementStatus = document.getElementById("memberAnnouncementStatus");
+
+if (memberAnnouncementForm && memberAnnouncementStatus) {
+  onAuthStateChanged(auth, async (user) => {
+    memberAnnouncementForm.hidden = true;
+
+    if (!user) {
+      memberAnnouncementStatus.textContent =
+        "Sign in with Google in the Family Tree section to post announcements.";
+      return;
+    }
+
+    try {
+      const memberDoc = await getDoc(doc(db, "approvedMembers", user.uid));
+
+      if (memberDoc.exists() && memberDoc.data().approved === true) {
+        memberAnnouncementForm.hidden = false;
+        memberAnnouncementStatus.textContent =
+          "Welcome! You can post family announcements.";
+      } else {
+        memberAnnouncementStatus.textContent =
+          "Only approved family members can post announcements.";
+      }
+    } catch (error) {
+      memberAnnouncementStatus.textContent =
+        "Unable to check membership: " + error.message;
+    }
+  });
+
+  memberAnnouncementForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const title = document.getElementById("memberAnnouncementTitle").value.trim();
+    const message = document.getElementById("memberAnnouncementMessage").value.trim();
+
+    if (!title || !message) return;
+
+    const submitButton = memberAnnouncementForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    memberAnnouncementStatus.textContent = "Posting announcement...";
+
+    try {
+      await addDoc(collection(db, "memberAnnouncements"), {
+        title: title,
+        message: message,
+        authorUid: user.uid,
+        authorName: (user.displayName || "Family Member").slice(0, 100),
+        createdAt: serverTimestamp()
+      });
+
+      memberAnnouncementForm.reset();
+      memberAnnouncementStatus.textContent =
+        "Your announcement was posted successfully!";
+    } catch (error) {
+      memberAnnouncementStatus.textContent =
+        "Unable to post: " + error.message;
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
+// END MEMBERS-ONLY FAMILY ANNOUNCEMENTS// FITSUM FAMILY MEMBERSHIP APPROVAL DASHBOARD
 const adminDashboard = document.getElementById("familyAdminDashboard");
 const pendingMembershipList = document.getElementById("pendingMembershipList");
 const adminMembershipStatus = document.getElementById("adminMembershipStatus");
@@ -1124,6 +1195,127 @@ if (adminDashboard && pendingMembershipList &&
   );
 }
 // END MEMBERSHIP APPROVAL DASHBOARD
+
+  
+/* MEMBERS-ONLY ANNOUNCEMENTS */
+const memberAnnouncementForm = document.getElementById("memberAnnouncementForm");
+const memberAnnouncementStatus = document.getElementById("memberAnnouncementStatus");
+
+if (memberAnnouncementForm && memberAnnouncementStatus) {
+  onAuthStateChanged(auth, async (user) => {
+    memberAnnouncementForm.hidden = true;
+
+    if (!user) {
+      memberAnnouncementStatus.textContent =
+        "Please sign in with Google in the Family Tree section to post announcements.";
+      return;
+    }
+
+    try {
+      const member = await getDoc(doc(db, "approvedMembers", user.uid));
+
+      if (member.exists() && member.data().approved === true) {
+        memberAnnouncementForm.hidden = false;
+        memberAnnouncementStatus.textContent =
+          "Welcome! You can post a family announcement.";
+      } else {
+        memberAnnouncementStatus.textContent =
+          "Only approved family members can post announcements.";
+      }
+    } catch (error) {
+      memberAnnouncementStatus.textContent =
+        "Unable to verify membership: " + error.message;
+    }
+  });
+
+  memberAnnouncementForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user || memberAnnouncementForm.hidden) return;
+
+    const submitButton = memberAnnouncementForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    memberAnnouncementStatus.textContent = "Posting announcement...";
+
+    try {
+      await addDoc(collection(db, "memberAnnouncements"), {
+        title: document.getElementById("memberAnnouncementTitle").value.trim(),
+        message: document.getElementById("memberAnnouncementMessage").value.trim(),
+        authorUid: user.uid,
+        authorName: user.displayName || "Family Member",
+        createdAt: serverTimestamp()
+      });
+
+      memberAnnouncementForm.reset();
+      memberAnnouncementStatus.textContent =
+        "Your announcement was posted successfully!";
+    } catch (error) {
+      memberAnnouncementStatus.textContent =
+        "Unable to post announcement: " + error.message;
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
+/* END MEMBERS-ONLY ANNOUNCEMENTS */
+ 
+/* DISPLAY FAMILY MEMBER ANNOUNCEMENTS */
+const memberAnnouncementPosts = document.getElementById("memberAnnouncementPosts");
+
+if (memberAnnouncementPosts) {
+  onAuthStateChanged(auth, async (user) => {
+    memberAnnouncementPosts.replaceChildren();
+
+    if (!user) {
+      memberAnnouncementPosts.textContent =
+        "Sign in to view family member announcements.";
+      return;
+    }
+
+    try {
+      const member = await getDoc(doc(db, "approvedMembers", user.uid));
+
+      if (!member.exists() || member.data().approved !== true) {
+        memberAnnouncementPosts.textContent =
+          "Only approved family members can view announcements.";
+        return;
+      }
+
+      const snapshot = await getDocs(collection(db, "memberAnnouncements"));
+      const posts = snapshot.docs
+        .map(item => item.data())
+        .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      if (posts.length === 0) {
+        memberAnnouncementPosts.textContent = "No family announcements yet.";
+        return;
+      }
+
+      posts.forEach(post => {
+        const card = document.createElement("div");
+        card.style.cssText =
+          "background:white;border:1px solid #c7a45b;border-radius:10px;padding:15px;margin:12px 0;";
+
+        const title = document.createElement("h4");
+        title.textContent = post.title || "Family Announcement";
+
+        const message = document.createElement("p");
+        message.textContent = post.message || "";
+
+        const author = document.createElement("small");
+        author.textContent = "Posted by " + (post.authorName || "Family Member");
+
+        card.append(title, message, author);
+        memberAnnouncementPosts.appendChild(card);
+      });
+    } catch (error) {
+      memberAnnouncementPosts.textContent =
+        "Unable to load announcements: " + error.message;
+    }
+  });
+}
+/* END DISPLAY FAMILY MEMBER ANNOUNCEMENTS */
 
 const gatheringForm = document.getElementById("gatheringSubmissionForm");
 const gatheringStatus = document.getElementById("gatheringFormStatus");
