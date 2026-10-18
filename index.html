@@ -636,6 +636,33 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 
 
 </div>
+  <!-- MEMBERS-ONLY ANNOUNCEMENT BOARD -->
+<div id="memberAnnouncementBoard"
+     style="max-width:650px;margin:25px auto;padding:20px;background:#fff9e9;border:2px solid #c7a45b;border-radius:12px;">
+
+  <h3>Family Member Announcements</h3>
+  <p id="memberAnnouncementStatus">
+    Sign in to post a family announcement.
+  </p>
+
+  <form id="memberAnnouncementForm" hidden>
+    <label for="memberAnnouncementTitle">Announcement Title</label>
+    <input id="memberAnnouncementTitle" type="text"
+           maxlength="120" required
+           style="width:100%;padding:10px;margin:8px 0 15px;">
+
+    <label for="memberAnnouncementMessage">Announcement Message</label>
+    <textarea id="memberAnnouncementMessage"
+              maxlength="2000" rows="5" required
+              style="width:100%;padding:10px;margin:8px 0 15px;"></textarea>
+
+    <button type="submit"
+            style="background:#176b43;color:white;padding:12px 20px;border:0;border-radius:8px;">
+      Post Announcement
+    </button>
+  </form>
+</div>
+<!-- END MEMBERS-ONLY ANNOUNCEMENT BOARD -->
 <div id="approvedAnnouncements" style="margin-top:20px;">
   <h3>Approved Family Announcements</h3>
   <p>Loading announcements...</p>
