@@ -1361,59 +1361,7 @@ if (gatheringForm && gatheringStatus) {
   });
 }
 
-// Display approved family announcements
-async function loadApprovedAnnouncements() {
-  const display = document.getElementById("approvedAnnouncements");
-  if (!display) return;
 
-  try {
-   const snapshot = await getDocs(
-  query(collection(db, "announcements"), where("status", "==", "approved"))
-);
-    display.innerHTML = "<h3>Approved Family Announcements</h3>";
-
-    let approvedCount = 0;
-
-    snapshot.forEach((doc) => {
-      const announcement = doc.data();
-
-      if (announcement.status !== "approved") return;
-      approvedCount++;
-
-      const card = document.createElement("div");
-      card.style.cssText =
-        "background:#fffdf7;border:1px solid #c7a45b;border-radius:10px;padding:15px;margin:12px 0;";
-
-      const heading = document.createElement("h4");
-      heading.textContent = announcement.host || "Family Gathering";
-
-      const details = document.createElement("p");
-      details.textContent =
-        "Date: " + (announcement.date || "TBA") +
-        " | Time: " + (announcement.time || "TBA");
-
-      const location = document.createElement("p");
-      location.textContent = "Location: " + (announcement.location || "TBA");
-
-      const message = document.createElement("p");
-      message.textContent = announcement.message || "";
-
-      card.append(heading, details, location, message);
-      display.appendChild(card);
-    });
-
-    if (approvedCount === 0) {
-      const empty = document.createElement("p");
-      empty.textContent = "No approved announcements yet.";
-      display.appendChild(empty);
-    }
-  } catch (error) {
-    console.error("Could not load announcements:", error);
-    display.textContent = "Announcements are temporarily unavailable.";
-  }
-}
-
-loadApprovedAnnouncements();
 
   // FAMILY TREE NAME SUBMISSIONS
   const familyLoginButton =
