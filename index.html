@@ -998,24 +998,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
-   
-const memberAnnouncementLogin = document.getElementById("memberAnnouncementLogin");
-
-if (memberAnnouncementLogin) {
-  memberAnnouncementLogin.addEventListener("click", async () => {
-    try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch (error) {
-      document.getElementById("memberAnnouncementStatus").textContent =
-        "Google sign-in failed: " + error.message;
-    }
-  });
-
-  onAuthStateChanged(auth, user => {
-    memberAnnouncementLogin.hidden = !!user;
-  });
-}
-
+  
 // Fitsum Family Association administrator
 const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
