@@ -1107,7 +1107,55 @@ loadApprovedAnnouncements();
 const privateTreeLogin = document.getElementById("privateTreeLogin");
 const privateTreeStatus = document.getElementById("privateTreeStatus");
 const privateTreeContent = document.getElementById("privateTreeContent");
-   
+// FAMILY MEMBERSHIP REQUEST
+const requestMembershipBtn =
+  document.getElementById("requestMembershipBtn");
+
+const membershipRequestStatus =
+  document.getElementById("membershipRequestStatus");
+
+if (requestMembershipBtn && membershipRequestStatus) {
+  requestMembershipBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      membershipRequestStatus.textContent =
+        "Please sign in with Google first.";
+      return;
+    }
+
+    requestMembershipBtn.disabled = true;
+    membershipRequestStatus.textContent =
+      "Submitting your membership request...";
+
+ try {
+  const requestRef = doc(db, "membershipRequests", user.uid);
+const existingRequest = await getDoc(requestRef);
+
+if (existingRequest.exists()) {
+  membershipRequestStatus.textContent =
+    "Your membership request has already been submitted.";
+  requestMembershipBtn.hidden = true;
+  return;
+}
+      await setDoc(doc(db, "membershipRequests", user.uid), {
+        name: user.displayName || "Family Member",
+        email: user.email || "",
+        status: "pending"
+      });
+
+      membershipRequestStatus.textContent =
+        "Your membership request was submitted successfully!";
+
+      requestMembershipBtn.hidden = true;
+    } catch (error) {
+      membershipRequestStatus.textContent =
+        "Request failed: " + error.message;
+    } finally {
+      requestMembershipBtn.disabled = false;
+    }
+  });
+}   
 
 if (privateTreeLogin && privateTreeStatus && privateTreeContent) {
 
@@ -1140,12 +1188,16 @@ if (privateTreeLogin && privateTreeStatus && privateTreeContent) {
       const memberRef = doc(db, "approvedMembers", user.uid);
       const memberSnapshot = await getDoc(memberRef);
 
-      if (!memberSnapshot.exists() ||
-          memberSnapshot.data().approved !== true) {
-        privateTreeStatus.textContent =
-          "Your account is waiting for administrator approval.";
-        return;
-      }
+     if (!memberSnapshot.exists() ||
+    memberSnapshot.data().approved !== true) {
+  privateTreeStatus.textContent =
+    "Your membership is not approved yet. Click below to request access.";
+
+  document.getElementById("requestMembershipBtn").hidden = false;
+  return;
+}
+
+document.getElementById("requestMembershipBtn").hidden = true;
 
       privateTreeStatus.textContent =
         "Welcome! Your family membership is approved.";
