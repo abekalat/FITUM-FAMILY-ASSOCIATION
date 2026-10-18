@@ -642,6 +642,12 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 
   <h3>Family Member Announcements</h3>
   <p id="memberAnnouncementStatus">
+    
+<button type="button" id="memberAnnouncementLogin"
+  style="background:#176b43;color:white;padding:12px 20px;border:0;border-radius:8px;cursor:pointer;margin-bottom:15px;">
+  Sign in with Google
+</button>
+
     Sign in to post a family announcement.
   </p>
 
@@ -996,6 +1002,26 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
 const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
 // MEMBERS-ONLY FAMILY ANNOUNCEMENTS
+ 
+/* GOOGLE SIGN-IN FOR FAMILY ANNOUNCEMENTS */
+const memberAnnouncementLogin = document.getElementById("memberAnnouncementLogin");
+
+if (memberAnnouncementLogin) {
+  memberAnnouncementLogin.addEventListener("click", async () => {
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch (error) {
+      document.getElementById("memberAnnouncementStatus").textContent =
+        "Sign-in failed: " + error.message;
+    }
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    memberAnnouncementLogin.hidden = !!user;
+  });
+}
+/* END ANNOUNCEMENT GOOGLE SIGN-IN */
+  
 const memberAnnouncementForm = document.getElementById("memberAnnouncementForm");
 const memberAnnouncementStatus = document.getElementById("memberAnnouncementStatus");
 
