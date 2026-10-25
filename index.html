@@ -1915,41 +1915,16 @@ detailsButton.style.cssText =
   "background:#176b43;color:white;border:0;border-radius:8px;padding:12px 20px;margin:15px auto;display:block;cursor:pointer;font-weight:bold;";
 const branchArea = document.createElement("div");
 tree.appendChild(detailsButton);
-  const familyDetails = document.createElement("div");
-familyDetails.hidden = true;
-familyDetails.style.cssText =
-  "background:#fffaf0;border:1px solid #c7a45b;border-radius:12px;padding:20px;margin:15px 0;text-align:left;display:none;";
-familyDetails.innerHTML = `
-  <h3>🌳 Fitsum Family Details</h3>
-  <p>Our 13 Family Branches:</p>
-  <ol>
-    <li>Wonishet & Tadesse</li>
-    <li>Emebet & Taye</li>
-    <li>Ababu & Germech</li>
-    <li>Fiyissa & Hargewoine</li>
-    <li>Tilahun & Sisay</li>
-    <li>Getenet & Eleni</li>
-    <li>Terefe & Marta</li>
-    <li>Zack & Betty</li>
-    <li>Cindi & Readet</li>
-    <li>Hilly & Abe</li>
-    <li>Sami</li>
-    <li>Tigist Tessema</li>
-    <li>Yohaness</li>
-  </ol>
-`;
 detailsButton.addEventListener("click", () => {
-  const isOpening = familyDetails.hidden;
-  familyDetails.hidden = !isOpening;
+  const isOpening = branchArea.hidden;
+
   branchArea.hidden = !isOpening;
-branchArea.style.display = isOpening ? "" : "none";
-  familyDetails.style.display = isOpening ? "block" : "none";
+  branchArea.style.display = isOpening ? "" : "none";
+
   detailsButton.textContent = isOpening
     ? "✖ Hide Family Details"
     : "🌳 View Family Details";
-});
-
-tree.appendChild(familyDetails);
+}); 
 const branches = [
   ["Wonishet & Tadesse", "wonishet-tadesse"],
   ["Emebet & Taye", "emebet-taye"],
