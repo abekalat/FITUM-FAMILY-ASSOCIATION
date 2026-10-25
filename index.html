@@ -1102,15 +1102,27 @@ if (memberAnnouncementForm && memberAnnouncementStatus) {
 
     const title = document.getElementById("memberAnnouncementTitle").value.trim();
     const message = document.getElementById("memberAnnouncementMessage").value.trim();
+const postType = document.getElementById("memberPostType").value;
+const collectionName = postType === "agenda"
+  ? "committeeAgendas"
+  : "memberAnnouncements";
+
 
     if (!title || !message) return;
 
     const submitButton = memberAnnouncementForm.querySelector('button[type="submit"]');
     submitButton.disabled = true;
-    memberAnnouncementStatus.textContent = "Posting announcement...";
+  
+memberAnnouncementStatus.textContent =
+  postType === "agenda"
+    ? "Submitting agenda to committee..."
+    : "Posting announcement...";
+
 
     try {
-      await addDoc(collection(db, "memberAnnouncements"), {
+    
+await addDoc(collection(db, collectionName), {
+
         title: title,
         message: message,
         authorUid: user.uid,
@@ -1120,7 +1132,11 @@ if (memberAnnouncementForm && memberAnnouncementStatus) {
 
       memberAnnouncementForm.reset();
       memberAnnouncementStatus.textContent =
-        "Your announcement was posted successfully!";
+        
+postType === "agenda"
+  ? "Your agenda was submitted successfully to the committee!"
+  : "Your announcement was posted successfully!";
+
     } catch (error) {
       memberAnnouncementStatus.textContent =
         "Unable to post: " + error.message;
