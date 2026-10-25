@@ -711,7 +711,13 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 <section id="myCommitteeReplies" hidden
   style="margin-top:25px;padding:20px;background:#fffaf0;border:1px solid #c7a45b;border-radius:12px;">
 
-  <h3 style="color:#173f35;">My Committee Agenda Replies</h3>
+  <h3 style="color:#173f35;">
+  <span id="committeeNotificationBell" hidden
+        style="color:#b45309;margin-right:8px;">
+    🔔 <span id="committeeUnreadCount">0</span>
+  </span>
+  My Committee Agenda Replies
+</h3>
   <p>View your submitted agendas and private responses from the committee.</p>
 
   <div id="myCommitteeRepliesList">
@@ -1517,9 +1523,20 @@ async function loadMyCommitteeReplies() {
       list.textContent = "You have not submitted any committee agendas.";
       return;
     }
-
+let unreadCount = 0;
+const seenKey = "committeeSeenReplies_" + user.uid;
+const seenReplies = JSON.parse(localStorage.getItem(seenKey) || "{}");
     snapshot.forEach(item => {
       const agenda = item.data();
+      if (agenda.adminReply) {
+  const replyVersion = agenda.repliedAt?.seconds
+    ? String(agenda.repliedAt.seconds)
+    : agenda.adminReply;
+
+  if (seenReplies[item.id] !== replyVersion) {
+    unreadCount++;
+  }
+}
       const card = document.createElement("div");
       card.style.cssText =
         "padding:15px;margin:12px 0;background:white;border:1px solid #c7a45b;border-radius:8px;";
@@ -1536,8 +1553,34 @@ async function loadMyCommitteeReplies() {
         : "Committee Reply: Awaiting response";
 
       card.append(title, status, reply);
+      if (agenda.adminReply) {
+  const markReadButton = document.createElement("button");
+  markReadButton.textContent = "✓ Mark as Read";
+  markReadButton.style.cssText =
+    "background:#176b43;color:white;border:0;border-radius:8px;padding:8px 12px;margin-top:10px;cursor:pointer;";
+
+  markReadButton.addEventListener("click", () => {
+    const replyVersion = agenda.repliedAt?.seconds
+      ? String(agenda.repliedAt.seconds)
+      : agenda.adminReply;
+
+    seenReplies[item.id] = replyVersion;
+    localStorage.setItem(seenKey, JSON.stringify(seenReplies));
+    loadMyCommitteeReplies();
+  });
+
+  card.appendChild(markReadButton);
+}
       list.appendChild(card);
-    });
+   });
+const bell = document.getElementById("committeeNotificationBell");
+const count = document.getElementById("committeeUnreadCount");
+
+if (bell && count) {
+  bell.hidden = unreadCount === 0;
+  bell.style.display = unreadCount > 0 ? "inline" : "none";
+  count.textContent = String(unreadCount);
+}
   } catch (error) {
     list.textContent = "Unable to load replies: " + error.message;
   }
