@@ -706,7 +706,20 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
     </button>
   </form>
 </div>
-  
+ 
+<!-- PRIVATE COMMITTEE REPLIES -->
+<section id="myCommitteeReplies" hidden
+  style="margin-top:25px;padding:20px;background:#fffaf0;border:1px solid #c7a45b;border-radius:12px;">
+
+  <h3 style="color:#173f35;">My Committee Agenda Replies</h3>
+  <p>View your submitted agendas and private responses from the committee.</p>
+
+  <div id="myCommitteeRepliesList">
+    Sign in to view your committee replies.
+  </div>
+</section>
+<!-- END PRIVATE COMMITTEE REPLIES -->
+ 
 <div id="memberAnnouncementPosts" style="margin-top:25px;">
   <h3>Family Member Posts</h3>
   <p>Loading family announcements...</p>
@@ -1148,7 +1161,7 @@ memberAnnouncementStatus.textContent =
 
     try {
     
-await addDoc(collection(db, collectionName), {
+const submittedDoc = await addDoc(collection(db, collectionName), {
 
         title: title,
         message: message,
@@ -1156,7 +1169,19 @@ await addDoc(collection(db, collectionName), {
         authorName: (user.displayName || "Family Member").slice(0, 100),
         createdAt: serverTimestamp()
       });
+if (postType === "agenda") {
+  const agendaId = submittedDoc.id;
+  const storageKey = "myCommitteeAgendaIds_" + user.uid;
 
+  const savedIds = JSON.parse(
+    localStorage.getItem(storageKey) || "[]"
+  );
+
+  if (!savedIds.includes(agendaId)) {
+    savedIds.push(agendaId);
+    localStorage.setItem(storageKey, JSON.stringify(savedIds));
+  }
+}
       memberAnnouncementForm.reset();
       memberAnnouncementStatus.textContent =
         
@@ -1343,7 +1368,10 @@ async function loadCommitteeAgendas() {
       return;
     }
 
-    const agendas = snapshot.docs.map(item => item.data());
+  const agendas = snapshot.docs.map(item => ({
+  id: item.id,
+  ...item.data()
+}));
     agendas.sort((a, b) =>
       (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
     );
@@ -1362,9 +1390,93 @@ async function loadCommitteeAgendas() {
       const author = document.createElement("small");
       author.textContent = "Submitted by: " +
         (agenda.authorName || "Family Member");
+const status = document.createElement("p");
+status.style.cssText = "font-weight:bold;color:#176b43;";
+status.textContent = "Status: " + (agenda.status || "Pending");
+const actions = document.createElement("div");
+actions.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:15px;";
 
-      card.append(title, message, author);
-      agendaList.appendChild(card);
+["Approve", "Reject", "Mark as Reviewed"].forEach(label => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.style.cssText =
+    "background:#176b43;color:white;padding:10px;border:0;border-radius:6px;cursor:pointer;";
+
+  button.addEventListener("click", async () => {
+    const newStatus = label === "Approve" ? "Approved"
+      : label === "Reject" ? "Rejected" : "Reviewed";
+
+    if (!confirm("Change agenda status to " + newStatus + "?")) return;
+    if (auth.currentUser?.uid !== FAMILY_ADMIN_UID) return;
+
+    button.disabled = true;
+
+    try {
+      await updateDoc(doc(db, "committeeAgendas", agenda.id), {
+        status: newStatus
+      });
+      await loadCommitteeAgendas();
+    } catch (error) {
+      alert("Unable to update agenda: " + error.message);
+      button.disabled = false;
+    }
+  });
+
+  actions.appendChild(button);
+});
+
+card.appendChild(actions);
+    
+const replyBox = document.createElement("div");
+replyBox.style.cssText = "margin-top:15px;";
+
+const replyInput = document.createElement("textarea");
+replyInput.placeholder = "Write a private reply to the sender...";
+replyInput.value = agenda.adminReply || "";
+replyInput.rows = 3;
+replyInput.style.cssText =
+  "width:100%;padding:10px;border:1px solid #c7a45b;border-radius:6px;box-sizing:border-box;";
+
+const replyButton = document.createElement("button");
+replyButton.type = "button";
+replyButton.textContent = "Send Reply";
+replyButton.style.cssText =
+  "background:#173f35;color:white;padding:10px 18px;border:0;border-radius:6px;margin-top:8px;cursor:pointer;";
+
+const replyStatus = document.createElement("p");
+replyStatus.setAttribute("role", "status");
+
+replyButton.addEventListener("click", async () => {
+  const reply = replyInput.value.trim();
+
+  if (!reply) {
+    replyStatus.textContent = "Please enter a reply.";
+    return;
+  }
+
+  if (auth.currentUser?.uid !== FAMILY_ADMIN_UID) return;
+
+  replyButton.disabled = true;
+
+  try {
+    await updateDoc(doc(db, "committeeAgendas", agenda.id), {
+      adminReply: reply,
+      repliedAt: serverTimestamp()
+    });
+
+    replyStatus.textContent = "Reply saved privately.";
+  } catch (error) {
+    replyStatus.textContent = "Unable to save reply: " + error.message;
+  } finally {
+    replyButton.disabled = false;
+  }
+});
+
+replyBox.append(replyInput, replyButton, replyStatus);
+card.appendChild(replyBox);
+  card.prepend(title, message, author);
+agendaList.appendChild(card);
     });
 
   } catch (error) {
@@ -1372,7 +1484,75 @@ async function loadCommitteeAgendas() {
   }
 }
 
-/* MEMBERS-ONLY ANNOUNCEMENTS */
+async function loadMyCommitteeReplies() {
+  const section = document.getElementById("myCommitteeReplies");
+  const list = document.getElementById("myCommitteeRepliesList");
+
+  if (!section || !list) return;
+
+  const user = auth.currentUser;
+  section.hidden = !user;
+  section.style.display = user ? "block" : "none";
+  list.replaceChildren();
+
+  if (!user) return;
+
+  list.textContent = "Loading your committee replies...";
+
+  try {
+    const storageKey = "myCommitteeAgendaIds_" + user.uid;
+const savedIds = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+const documents = await Promise.all(
+  savedIds.map(id => getDoc(doc(db, "committeeAgendas", id)))
+);
+
+const snapshot = {
+  empty: documents.every(item => !item.exists()),
+  forEach(callback) {
+    documents.filter(item => item.exists()).forEach(callback);
+  }
+};
+    if (auth.currentUser?.uid !== user.uid) {
+      list.replaceChildren();
+      return;
+    }
+
+    list.replaceChildren();
+
+    if (snapshot.empty) {
+      list.textContent = "You have not submitted any committee agendas.";
+      return;
+    }
+
+    snapshot.forEach(item => {
+      const agenda = item.data();
+      const card = document.createElement("div");
+      card.style.cssText =
+        "padding:15px;margin:12px 0;background:white;border:1px solid #c7a45b;border-radius:8px;";
+
+      const title = document.createElement("h4");
+      title.textContent = agenda.title || "Committee Agenda";
+
+      const status = document.createElement("p");
+      status.textContent = "Status: " + (agenda.status || "Pending");
+
+      const reply = document.createElement("p");
+      reply.textContent = agenda.adminReply
+        ? "Committee Reply: " + agenda.adminReply
+        : "Committee Reply: Awaiting response";
+
+      card.append(title, status, reply);
+      list.appendChild(card);
+    });
+  } catch (error) {
+    list.textContent = "Unable to load replies: " + error.message;
+  }
+}
+
+
+   
+   /* MEMBERS-ONLY ANNOUNCEMENTS */
 
 if (memberAnnouncementForm && memberAnnouncementStatus) {
   onAuthStateChanged(auth, async (user) => {
@@ -1400,7 +1580,9 @@ if (memberAnnouncementForm && memberAnnouncementStatus) {
         "Unable to verify membership: " + error.message;
     }
   });
-
+onAuthStateChanged(auth, () => {
+  loadMyCommitteeReplies();
+});
  
 }
 /* END MEMBERS-ONLY ANNOUNCEMENTS */
