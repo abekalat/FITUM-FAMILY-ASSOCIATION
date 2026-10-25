@@ -663,6 +663,14 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
   </p>
 
   <form id="memberAnnouncementForm" hidden>
+    
+<label for="memberPostType">Choose Submission Type</label>
+<select id="memberPostType" required
+  style="width:100%;padding:12px;margin:8px 0 15px;border-radius:8px;">
+  <option value="announcement">Family Announcement</option>
+  <option value="agenda">Submit New Agenda to Committee</option>
+</select>
+
     <label for="memberAnnouncementTitle">Announcement Title</label>
     <input id="memberAnnouncementTitle" type="text"
            maxlength="120" required
