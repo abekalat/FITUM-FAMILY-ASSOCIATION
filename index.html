@@ -1909,7 +1909,32 @@ tree.className = "real-family-tree";
 const title = document.createElement("h2");
 title.textContent = "The Fitsum Family";
 tree.appendChild(title);
+const detailsButton = document.createElement("button");
+detailsButton.textContent = "🌳 View Family Details";
+detailsButton.style.cssText =
+  "background:#176b43;color:white;border:0;border-radius:8px;padding:12px 20px;margin:15px auto;display:block;cursor:pointer;font-weight:bold;";
 
+tree.appendChild(detailsButton);
+  const familyDetails = document.createElement("div");
+familyDetails.hidden = true;
+familyDetails.style.cssText =
+  "background:#fffaf0;border:1px solid #c7a45b;border-radius:12px;padding:20px;margin:15px 0;text-align:left;display:none;";
+
+familyDetails.innerHTML = `
+  <h3>🌳 Fitsum Family Details</h3>
+  <p>Select a family branch to explore more information about that family.</p>
+`;
+
+detailsButton.addEventListener("click", () => {
+  const isOpening = familyDetails.hidden;
+  familyDetails.hidden = !isOpening;
+  familyDetails.style.display = isOpening ? "block" : "none";
+  detailsButton.textContent = isOpening
+    ? "✖ Hide Family Details"
+    : "🌳 View Family Details";
+});
+
+tree.appendChild(familyDetails);
 const branches = [
   ["Wonishet & Tadesse", "wonishet-tadesse"],
   ["Emebet & Taye", "emebet-taye"],
