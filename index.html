@@ -169,7 +169,9 @@
 </nav></div></header>
 
 <div style="text-align:center;padding:20px;background:#fff9e9;">
-  <a href="#board"
+  <a href="#board" 
+onclick="event.preventDefault(); const board = document.getElementById('board'); const opening = board.style.display === 'none'; board.style.display = opening ? 'block' : 'none'; board.hidden = !opening; if (opening) board.scrollIntoView({behavior:'smooth'});"
+ const board = document.getElementById('board'); board.hidden = !board.hidden; if (!board.hidden) board.scrollIntoView({behavior:'smooth'});"
      style="display:inline-block;background:#176b43;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">
     Board of Directors | የዳይሬክተሮች ቦርድ
   </a>
@@ -283,7 +285,7 @@
 }
 </style>
 
-<section class="section white" id="board">
+<section class="section white" id="board" hidden style="display:none;">
   <div class="wrap">
     <div class="section-head">
       <div class="eyebrow">Our Leadership</div>
