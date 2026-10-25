@@ -1913,7 +1913,7 @@ const detailsButton = document.createElement("button");
 detailsButton.textContent = "🌳 View Family Details";
 detailsButton.style.cssText =
   "background:#176b43;color:white;border:0;border-radius:8px;padding:12px 20px;margin:15px auto;display:block;cursor:pointer;font-weight:bold;";
-
+const branchArea = document.createElement("div");
 tree.appendChild(detailsButton);
   const familyDetails = document.createElement("div");
 familyDetails.hidden = true;
@@ -1941,6 +1941,8 @@ familyDetails.innerHTML = `
 detailsButton.addEventListener("click", () => {
   const isOpening = familyDetails.hidden;
   familyDetails.hidden = !isOpening;
+  branchArea.hidden = !isOpening;
+branchArea.style.display = isOpening ? "" : "none";
   familyDetails.style.display = isOpening ? "block" : "none";
   detailsButton.textContent = isOpening
     ? "✖ Hide Family Details"
@@ -1964,7 +1966,6 @@ const branches = [
   ["Yohaness", "yohaness"]
 ];
 
-const branchArea = document.createElement("div");
 branchArea.className = "real-tree-branches";
 
 branches.forEach(([label, branchId]) => {
@@ -2063,7 +2064,8 @@ if (info) {
   branch.appendChild(children);
   branchArea.appendChild(branch);
 });
-
+branchArea.hidden = true;
+branchArea.style.display = "none";
 tree.appendChild(branchArea);
 privateTreeContent.appendChild(tree);
 
