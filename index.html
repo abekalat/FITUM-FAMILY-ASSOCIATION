@@ -1500,19 +1500,12 @@ async function loadMyCommitteeReplies() {
   list.textContent = "Loading your committee replies...";
 
   try {
-    const storageKey = "myCommitteeAgendaIds_" + user.uid;
-const savedIds = JSON.parse(localStorage.getItem(storageKey) || "[]");
-
-const documents = await Promise.all(
-  savedIds.map(id => getDoc(doc(db, "committeeAgendas", id)))
+  const snapshot = await getDocs(
+  query(
+    collection(db, "committeeAgendas"),
+    where("authorUid", "==", user.uid)
+  )
 );
-
-const snapshot = {
-  empty: documents.every(item => !item.exists()),
-  forEach(callback) {
-    documents.filter(item => item.exists()).forEach(callback);
-  }
-};
     if (auth.currentUser?.uid !== user.uid) {
       list.replaceChildren();
       return;
