@@ -176,6 +176,14 @@ onclick="event.preventDefault(); const board = document.getElementById('board');
     Board of Directors | የዳይሬክተሮች ቦርድ
   </a>
 </div>
+<div style="text-align:center;padding:10px;background:#fff9e9;">
+  <a href="#family-committees"
+     onclick="event.preventDefault(); const committee = document.getElementById('family-committees'); const opening = committee.style.display === 'none'; committee.style.display = opening ? 'block' : 'none'; committee.hidden = !opening; if (opening) committee.scrollIntoView({behavior:'smooth'});"
+     style="display:inline-block;background:#176b43;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">
+    Family Committees | የቤተሰብ ኮሚቴዎች
+  </a>
+</div>
+
 
   <main>
 <section class="hero" id="home">
@@ -449,7 +457,9 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
   </div>
 </section>
 
-<section id="family-committees" style="padding:45px 20px;background:#fffaf0;">
+
+<section id="family-committees" hidden style="display:none;padding:45px 20px;background:#fffaf0;">
+
   <h2 style="text-align:center;color:#173f35;">
     Family Committees
   </h2>
