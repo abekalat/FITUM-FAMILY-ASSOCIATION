@@ -627,6 +627,25 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
   </div>
 </section>
 
+<!-- PRIVATE COMMITTEE AGENDA MANAGEMENT -->
+<section id="committee-agenda-management" hidden
+  style="padding:30px 20px;background:#fffaf0;border:2px solid #c7a45b;border-radius:15px;margin:25px auto;max-width:1000px;">
+
+  <h2 style="color:#173f35;text-align:center;">
+    Committee Agenda Management
+  </h2>
+
+  <p style="text-align:center;">
+    Private agenda submissions for authorized administrators.
+  </p>
+
+  <div id="committeeAgendaList">
+    Loading committee agendas...
+  </div>
+
+</section>
+<!-- END PRIVATE COMMITTEE AGENDA MANAGEMENT -->
+
  <section class="section" id="events"><div class="wrap"><div class="section-head"><div class="eyebrow" data-en="Stay connected" data-am="በግንኙነት እንቆይ">Stay connected</div><h2 data-en="Family Events" data-am="የቤተሰብ ዝግጅቶች">Family Events</h2><p data-en="Make memories together. Add upcoming reunions, celebrations, and community activities here." data-am="አብረን ትዝታዎችን እንፍጠር። መጪ የቤተሰብ ስብሰባዎችን፣ በዓላትን እና የማህበረሰብ እንቅስቃሴዎችን እዚህ ያስገቡ።">Make memories together. Add upcoming reunions, celebrations, and community activities here.</p></div>
 <div class="cards"><article class="card"><div class="cardbody"><div class="symbol">✧</div>
 <h3 data-en="Monthly Family Gathering" data-am="ወርሃዊ የቤተሰብ ስብሰባ">Monthly Family Gathering</h3>
@@ -1274,11 +1293,18 @@ if (adminDashboard && pendingMembershipList &&
       user && user.uid === FAMILY_ADMIN_UID;
 
     adminDashboard.hidden = !isAdmin;
+const committeeAgendaSection = document.getElementById("committee-agenda-management");
 
+if (committeeAgendaSection) {
+  committeeAgendaSection.hidden = !isAdmin;
+  committeeAgendaSection.style.display = isAdmin ? "block" : "none";
+}
     if (isAdmin) {
       loadMembershipRequests();
+      loadCommitteeAgendas();
     } else {
       pendingMembershipList.replaceChildren();
+      
     }
   });
 
@@ -1289,6 +1315,63 @@ if (adminDashboard && pendingMembershipList &&
 // END MEMBERSHIP APPROVAL DASHBOARD
 
   
+async function loadCommitteeAgendas() {
+  const agendaList = document.getElementById("committeeAgendaList");
+  if (!agendaList) return;
+
+  const user = auth.currentUser;
+  if (!user || user.uid !== FAMILY_ADMIN_UID) {
+    agendaList.replaceChildren();
+    return;
+  }
+
+  agendaList.textContent = "Loading committee agendas...";
+
+  try {
+    const snapshot = await getDocs(collection(db, "committeeAgendas"));
+
+    // Recheck authorization after the asynchronous request.
+    if (auth.currentUser?.uid !== FAMILY_ADMIN_UID) {
+      agendaList.replaceChildren();
+      return;
+    }
+
+    agendaList.replaceChildren();
+
+    if (snapshot.empty) {
+      agendaList.textContent = "No committee agendas submitted yet.";
+      return;
+    }
+
+    const agendas = snapshot.docs.map(item => item.data());
+    agendas.sort((a, b) =>
+      (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+    );
+
+    agendas.forEach(agenda => {
+      const card = document.createElement("div");
+      card.style.cssText =
+        "background:white;border:1px solid #c7a45b;border-radius:10px;padding:18px;margin:15px 0;";
+
+      const title = document.createElement("h3");
+      title.textContent = agenda.title || "Untitled Agenda";
+
+      const message = document.createElement("p");
+      message.textContent = agenda.message || "";
+
+      const author = document.createElement("small");
+      author.textContent = "Submitted by: " +
+        (agenda.authorName || "Family Member");
+
+      card.append(title, message, author);
+      agendaList.appendChild(card);
+    });
+
+  } catch (error) {
+    agendaList.textContent = "Unable to load agendas: " + error.message;
+  }
+}
+
 /* MEMBERS-ONLY ANNOUNCEMENTS */
 
 if (memberAnnouncementForm && memberAnnouncementStatus) {
