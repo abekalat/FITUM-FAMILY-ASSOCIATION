@@ -1318,35 +1318,7 @@ if (memberAnnouncementForm && memberAnnouncementStatus) {
     }
   });
 
-  memberAnnouncementForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const user = auth.currentUser;
-    if (!user || memberAnnouncementForm.hidden) return;
-
-    const submitButton = memberAnnouncementForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    memberAnnouncementStatus.textContent = "Posting announcement...";
-
-    try {
-      await addDoc(collection(db, "memberAnnouncements"), {
-        title: document.getElementById("memberAnnouncementTitle").value.trim(),
-        message: document.getElementById("memberAnnouncementMessage").value.trim(),
-        authorUid: user.uid,
-        authorName: user.displayName || "Family Member",
-        createdAt: serverTimestamp()
-      });
-
-      memberAnnouncementForm.reset();
-      memberAnnouncementStatus.textContent =
-        "Your announcement was posted successfully!";
-    } catch (error) {
-      memberAnnouncementStatus.textContent =
-        "Unable to post announcement: " + error.message;
-    } finally {
-      submitButton.disabled = false;
-    }
-  });
+ 
 }
 /* END MEMBERS-ONLY ANNOUNCEMENTS */
  
