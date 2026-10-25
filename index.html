@@ -1919,12 +1919,25 @@ tree.appendChild(detailsButton);
 familyDetails.hidden = true;
 familyDetails.style.cssText =
   "background:#fffaf0;border:1px solid #c7a45b;border-radius:12px;padding:20px;margin:15px 0;text-align:left;display:none;";
-
 familyDetails.innerHTML = `
   <h3>🌳 Fitsum Family Details</h3>
-  <p>Select a family branch to explore more information about that family.</p>
+  <p>Our 13 Family Branches:</p>
+  <ol>
+    <li>Wonishet & Tadesse</li>
+    <li>Emebet & Taye</li>
+    <li>Ababu & Germech</li>
+    <li>Fiyissa & Hargewoine</li>
+    <li>Tilahun & Sisay</li>
+    <li>Getenet & Eleni</li>
+    <li>Terefe & Marta</li>
+    <li>Zack & Betty</li>
+    <li>Cindi & Readet</li>
+    <li>Hilly & Abe</li>
+    <li>Sami</li>
+    <li>Tigist Tessema</li>
+    <li>Yohaness</li>
+  </ol>
 `;
-
 detailsButton.addEventListener("click", () => {
   const isOpening = familyDetails.hidden;
   familyDetails.hidden = !isOpening;
