@@ -751,11 +751,7 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 <!-- PRIVATE FITSUM FAMILY TREE -->
 <div id="privateFamilyTree" style="max-width:950px;margin:30px auto;padding:25px;background:#fff;border:3px solid #c7a45b;border-radius:15px;text-align:center;">
 
-  <h3 style="color:#173f35;">
-    Fitsum Family Tree - Members Only
-  </h3>
-
-  <p id="privateTreeStatus">
+    <p id="privateTreeStatus">
     Checking member access...
   </p>
 
@@ -1890,10 +1886,7 @@ if (familyDocumentsSection) {
 }
 
 document.getElementById("requestMembershipBtn").hidden = true;
-
-      privateTreeStatus.textContent =
-        "Welcome! Your family membership is approved.";
-
+privateTreeStatus.textContent = ""; 
 const familyDocuments = document.getElementById("familyDocuments");
 if (familyDocuments) {
   familyDocuments.hidden = false;
