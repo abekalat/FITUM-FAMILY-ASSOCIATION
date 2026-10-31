@@ -969,7 +969,9 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 (function(){
  const toggle=document.getElementById('languageToggle'); let lang='en';
  function setLang(next){lang=next;document.documentElement.lang=lang==='am'?'am':'en';document.querySelectorAll('[data-en][data-am]').forEach(el=>{el.textContent=el.dataset[lang];if(lang==='am')el.classList.add('amharic');else el.classList.remove('amharic')});toggle.textContent=lang==='en'?'አማርኛ / English':'English / አማርኛ';}
- toggle.addEventListener('click',()=>setLang(lang==='en'?'am':'en'));
+document.getElementById('languageToggle').addEventListener('click', function() {
+  setLang(lang === 'en' ? 'am' : 'en');
+});
  const menu=document.getElementById('menuBtn'), nav=document.getElementById('navlinks');
  menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));});
  nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false')}));
