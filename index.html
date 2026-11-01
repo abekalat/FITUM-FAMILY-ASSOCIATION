@@ -688,6 +688,34 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
   <p style="text-align:center;margin-top:15px;">Family Gathering — First Saturday of Each Month</p>
   <p id="calMeeting" style="text-align:center;font-weight:bold;color:#173f35;"></p>
 
+<div id="gatheringDetails"
+     style="margin-top:20px;padding:18px;background:#fffaf0;border:1px solid #c7a45b;border-radius:10px;">
+
+  <h4 style="text-align:center;color:#173f35;">
+    Family Gathering Details / የቤተሰብ ስብሰባ
+  </h4>
+
+  <label for="hostDate">Gathering Date / የስብሰባ ቀን</label>
+  <input type="date" id="hostDate"
+         style="display:block;width:100%;box-sizing:border-box;padding:10px;margin:8px 0 15px;">
+
+  <label for="hostTime">Meeting Time / የስብሰባ ሰዓት</label>
+  <input type="time" id="hostTime"
+         style="display:block;width:100%;box-sizing:border-box;padding:10px;margin:8px 0 15px;">
+
+  <label for="hostFamily">Hosting Family / አስተናጋጅ ቤተሰብ</label>
+  <select id="hostFamily"
+          style="display:block;width:100%;padding:10px;margin:8px 0 15px;">
+    <option value="">Select Hosting Family</option>
+  </select>
+
+  <p id="gatheringSummary"
+     style="text-align:center;font-weight:bold;color:#173f35;">
+    Gathering details will appear here.
+  </p>
+
+</div>
+
 
 </div>
   <!-- MEMBERS-ONLY ANNOUNCEMENT BOARD -->
@@ -1008,6 +1036,32 @@ let calendarMonth = calendarToday.getMonth();
 // Example: "2026-11": 14 means November 14.
 const changedMeetingDates = {};
 
+const familyHouseholds = [
+  "Wonishet & Tadesse",
+  "Emebet & Taye",
+  "Ababu & Germech",
+  "Fiyissa & Hargewoine",
+  "Tilahun & Sisay",
+  "Getenet & Eleni",
+  "Terefe & Marta",
+  "Zack & Betty",
+  "Cindi & Redeat",
+  "Hilly & Abe",
+  "Sami",
+  "Tigist Tessema",
+  "Yohaness"
+];
+
+// Official meeting schedule, organized by month.
+// Change these values in GitHub to update the website.
+const familyMeetingSchedule = {
+  "2026-11": {
+    date: "2026-11-07",
+    time: "15:00",
+    host: ""
+  }
+};
+
 function drawFamilyCalendar() {
   const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
   const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
@@ -1016,10 +1070,30 @@ function drawFamilyCalendar() {
   const monthKey = calendarYear + "-" +
     String(calendarMonth + 1).padStart(2, "0");
 
-  const override = changedMeetingDates[monthKey];
-  const meetingDay = Number.isInteger(override) &&
-    override >= 1 && override <= daysInMonth
-      ? override : firstSaturday;
+ 
+const scheduleDate = familyMeetingSchedule[monthKey]?.date || "";
+const parts = scheduleDate.split("-");
+
+const scheduledDay =
+  parts.length === 3 &&
+  Number(parts[0]) === calendarYear &&
+  Number(parts[1]) === calendarMonth + 1
+    ? Number(parts[2])
+    : null;
+
+const override = changedMeetingDates[monthKey];
+
+const meetingDay =
+  Number.isInteger(scheduledDay) &&
+  scheduledDay >= 1 &&
+  scheduledDay <= daysInMonth
+    ? scheduledDay
+    : Number.isInteger(override) &&
+      override >= 1 &&
+      override <= daysInMonth
+        ? override
+        : firstSaturday;
+
 
   document.getElementById("calMonth").textContent =
     new Date(calendarYear, calendarMonth, 1)
@@ -1064,6 +1138,50 @@ function drawFamilyCalendar() {
         day: "numeric",
         year: "numeric"
       });
+  
+const schedule = familyMeetingSchedule[monthKey] || {};
+
+const dateInput = document.getElementById("hostDate");
+const timeInput = document.getElementById("hostTime");
+const familySelect = document.getElementById("hostFamily");
+const summary = document.getElementById("gatheringSummary");
+
+const gatheringDate = schedule.date ||
+  `${monthKey}-${String(meetingDay).padStart(2, "0")}`;
+
+dateInput.value = gatheringDate;
+timeInput.value = schedule.time || "";
+
+familySelect.innerHTML =
+  '<option value="">Not assigned</option>';
+
+familyHouseholds.forEach(family => {
+  const option = document.createElement("option");
+  option.value = family;
+  option.textContent = family;
+  familySelect.appendChild(option);
+});
+
+familySelect.value = schedule.host || "";
+
+const displayTime = schedule.time
+  ? new Date(`2000-01-01T${schedule.time}:00`)
+      .toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit"
+      })
+  : "Not confirmed";
+
+summary.textContent =
+  "Date: " + gatheringDate +
+  " | Time: " + displayTime +
+  " | Hosting Family: " + (schedule.host || "Not assigned");
+
+// Only the website administrator can change the official schedule in GitHub.
+dateInput.disabled = true;
+timeInput.disabled = true;
+familySelect.disabled = true;
+
 }
 
 document.getElementById("calPrev").addEventListener("click", () => {
