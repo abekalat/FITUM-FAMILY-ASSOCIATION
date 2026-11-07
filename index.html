@@ -1180,10 +1180,9 @@ summary.textContent =
   " | Hosting Family: " + (schedule.host || "Not assigned");
 
 // Only the website administrator can change the official schedule in GitHub.
-dateInput.disabled = false;
-timeInput.disabled = false;
-familySelect.disabled = false;
-
+dateInput.disabled = true;
+timeInput.disabled = true;
+familySelect.disabled = true;
 }
 
 document.getElementById("calPrev").addEventListener("click", () => {
