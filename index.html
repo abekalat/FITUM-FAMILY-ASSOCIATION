@@ -800,6 +800,40 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 <section class="section" id="history"><div class="wrap two-col"><div><div class="eyebrow" data-en="Our legacy" data-am="ቅርሳችን">Our legacy</div><h2 data-en="Every family has a story worth preserving." data-am="እያንዳንዱ ቤተሰብ ሊጠበቅ የሚገባው ታሪክ አለው።">Every family has a story worth preserving.</h2><p data-en="Our family history lives in the memories of our elders, the journeys of our relatives, and the values passed to each new generation. Help us build this archive by sharing names, photographs, dates, and stories verified by family members." data-am="የቤተሰባችን ታሪክ በአዛውንቶቻችን ትዝታዎች፣ በዘመዶቻችን ጉዞዎች እና ለእያንዳንዱ አዲስ ትውልድ በሚተላለፉ እሴቶች ውስጥ ይኖራል። የቤተሰብ አባላት ያረጋገጧቸውን ስሞች፣ ፎቶዎች፣ ቀናትና ታሪኮች በማካፈል ይህን ማህደር እንድንገነባ ይርዱን።">Our family history lives in the memories of our elders, the journeys of our relatives, and the values passed to each new generation. Help us build this archive by sharing names, photographs, dates, and stories verified by family members.</p><div class="notice"><strong data-en="Help complete our history" data-am="ታሪካችንን ለማሟላት ይርዱ">Help complete our history</strong><p data-en="The association has not yet added verified family dates or a family tree. Add only details approved for sharing by the family." data-am="ማህበሩ እስካሁን የተረጋገጡ የቤተሰብ ቀናትን ወይም የዘር ሐረግ አላከለም። ቤተሰቡ እንዲጋሩ የፈቀዳቸውን መረጃዎች ብቻ ያክሉ።">The association has not yet added verified family dates or a family tree. Add only details approved for sharing by the family.</p></div></div><div class="heritage-art" role="img" aria-label="Family heritage"></div></div></section>
 <section class="section white" id="gallery"><div class="wrap"><div class="section-head"><div class="eyebrow" data-en="Moments we cherish" data-am="የምንወዳቸው ትዝታዎች">Moments we cherish</div><h2 data-en="Family Gallery" data-am="የቤተሰብ ፎቶ ማህደር">Family Gallery</h2><p data-en="Replace these sample images with family-approved photographs from reunions and celebrations." data-am="እነዚህን ምሳሌ ፎቶዎች ቤተሰቡ እንዲጋሩ በፈቀዳቸው የስብሰባና የበዓል ፎቶዎች ይተኩ።">Replace these sample images with family-approved photographs from reunions and celebrations.</p></div>
 <div class="gallery"><figure><img loading="lazy" src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&=crop&w=700&q=80" alt="Family spending time together"><figcaption data-en="Togetherness" data-am="አንድነት">Togetherness</figcaption></figure><figure><img loading="lazy" src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&=crop&w=700&q=80" alt="Friends and family gathering"><figcaption data-en="Celebrations" data-am="በዓላት">Celebrations</figcaption></figure><figure><img loading="lazy" src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&=crop&w=700&q=80" alt="People enjoying a gathering"><figcaption data-en="Shared memories" data-am="የጋራ ትዝታዎች">Shared memories</figcaption></figure></div></div></section>
+
+<!-- MEMBERS-ONLY FAMILY BIOGRAPHIES -->
+<section id="member-biographies" class="section white" hidden>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Our Family Stories</div>
+      <h2>Member Biographies / የቤተሰብ አባላት ታሪክ</h2>
+      <p>Share your story and preserve our family history.</p>
+    </div>
+
+    <div id="biographyContent">
+      
+<form id="biographyForm" hidden>
+  <h3>Submit Your Biography / የሕይወት ታሪክ</h3>
+
+  <label for="bioName">Full Name</label>
+  <input id="bioName" type="text" maxlength="100" required>
+
+  <label for="bioRelationship">Family Relationship</label>
+  <input id="bioRelationship" type="text" maxlength="100">
+
+  <label for="bioStory">Your Biography</label>
+  <textarea id="bioStory" rows="6" maxlength="3000"
+    placeholder="Tell us about your family history, memories, and achievements..."
+    required></textarea>
+
+  <button type="submit">Submit for Approval</button>
+  <p id="biographyStatus" role="status"></p>
+</form>
+
+      <p>Sign in as an approved member to submit your biography.</p>
+    </div>
+  </div>
+</section>
 <section id="family-tree" style="padding:45px 20px;background:#fffaf0;text-align:center;">
 
   <h2 style="color:#173f35;">
@@ -1246,6 +1280,13 @@ const memberAnnouncementForm = document.getElementById("memberAnnouncementForm")
 const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
  // Family gathering calendar connection
 const familyGatheringsCollection = collection(db, "familyGatherings");
+   
+const memberBiographiesCollection = collection(db, "memberBiographies");
+
+const biographyForm = document.getElementById("biographyForm");
+const biographySection = document.getElementById("member-biographies");
+const biographyStatus = document.getElementById("biographyStatus");
+
 async function loadFamilyGathering(monthKey) {
   const user = auth.currentUser;
   if (!user) return;
@@ -1355,6 +1396,15 @@ if (user && !calendarApproved) {
   }
 }
 
+if (biographySection) {
+  biographySection.hidden = !calendarApproved;
+  biographySection.style.display = calendarApproved ? "block" : "none";
+}
+
+if (biographyForm) {
+  biographyForm.hidden = !calendarApproved;
+}
+
 if (familyCalendar && calendarApproved) {
   familyCalendar.hidden = false;
   familyCalendar.style.display = "block";
@@ -1371,6 +1421,60 @@ if (user && calendarApproved) {
   }
 
   drawFamilyCalendar();
+  
+if (biographyForm) {
+  biographyForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      biographyStatus.textContent = "Please sign in first.";
+      return;
+    }
+
+    biographyStatus.textContent = "Checking membership...";
+
+    try {
+      const member = await getDoc(
+        doc(db, "approvedMembers", user.uid)
+      );
+
+      if (!isCalendarAdmin(user) &&
+          !(member.exists() && member.data().approved === true)) {
+        biographyStatus.textContent = "Approved members only.";
+        return;
+      }
+
+      const name = document.getElementById("bioName").value.trim();
+      const relationship = document.getElementById("bioRelationship").value.trim();
+      const story = document.getElementById("bioStory").value.trim();
+
+      if (!name || !story) {
+        biographyStatus.textContent = "Name and biography are required.";
+        return;
+      }
+
+      await setDoc(doc(db, "memberBiographies", user.uid), {
+        name,
+        relationship,
+        story,
+        status: "pending",
+        authorUid: user.uid,
+        submittedAt: serverTimestamp()
+      });
+
+      biographyStatus.textContent =
+        "Biography submitted! Waiting for administrator approval.";
+
+    } catch (error) {
+      console.error("Biography submission failed:", error);
+      biographyStatus.textContent =
+        "Could not submit biography. Please try again.";
+    }
+  });
+}
+
 });
 
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
