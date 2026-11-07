@@ -677,7 +677,7 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 <div class="meta" data-en="EVERY FIRST SATURDAY OF THE MONTH" data-am="በየወሩ የመጀመሪያ ቅዳሜ">EVERY FIRST SATURDAY OF THE MONTH</div>
 </div></article>
 
-<div id="family-calendar" style="max-width:650px;margin:30px auto;padding:20px;background:#fffdf7;border:2px solid #c7a45b;border-radius:15px;">
+<div id="family-calendar" hidden style="display:none;"max-width:650px;margin:30px auto;padding:20px;background:#fffdf7;border:2px solid #c7a45b;border-radius:15px;">
   <h3 style="text-align:center;color:#173f35;">Monthly Family Calendar</h3>
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
     <button type="button" id="calPrev">❮ Previous</button>
@@ -713,6 +713,14 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
      style="text-align:center;font-weight:bold;color:#173f35;">
     Gathering details will appear here.
   </p>
+
+<button type="button" id="saveGathering"
+  hidden
+  style="background:#176b43;color:white;padding:12px 20px;border:0;border-radius:8px;cursor:pointer;margin-top:15px;">
+  Save Gathering Changes
+</button>
+
+<p id="gatheringSaveStatus" role="status"></p>
 
 </div>
 
@@ -1054,14 +1062,11 @@ const familyHouseholds = [
 
 // Official meeting schedule, organized by month.
 // Change these values in GitHub to update the website.
-const familyMeetingSchedule = {
- 
-"2026-11": {
-  date: "2026-11-14",
-  time: "20:00",
-  host: "Wonishet & Tadesse"
-}
+const familyMeetingSchedule = {};
 
+window.updateFamilyGathering = function(monthKey, details) {
+  familyMeetingSchedule[monthKey] = details;
+  drawFamilyCalendar();
 };
 
 function drawFamilyCalendar() {
@@ -1180,9 +1185,11 @@ summary.textContent =
   " | Hosting Family: " + (schedule.host || "Not assigned");
 
 // Only the website administrator can change the official schedule in GitHub.
-dateInput.disabled = true;
-timeInput.disabled = true;
-familySelect.disabled = true;
+// Keep fields locked until Firebase verifies the administrator.
+const calendarAdmin = window.familyCalendarAdmin === true;
+dateInput.disabled = !calendarAdmin;
+timeInput.disabled = !calendarAdmin;
+familySelect.disabled = !calendarAdmin;
 }
 
 document.getElementById("calPrev").addEventListener("click", () => {
@@ -1193,6 +1200,9 @@ document.getElementById("calPrev").addEventListener("click", () => {
     calendarMonth--;
   }
   drawFamilyCalendar();
+  if (window.loadSelectedFamilyGathering) {
+  window.loadSelectedFamilyGathering();
+}
 });
 
 document.getElementById("calNext").addEventListener("click", () => {
@@ -1203,6 +1213,9 @@ document.getElementById("calNext").addEventListener("click", () => {
     calendarMonth++;
   }
   drawFamilyCalendar();
+  if (window.loadSelectedFamilyGathering) {
+  window.loadSelectedFamilyGathering();
+}
 });
 
 document.addEventListener("DOMContentLoaded", drawFamilyCalendar);
@@ -1231,6 +1244,135 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
 const memberAnnouncementForm = document.getElementById("memberAnnouncementForm");
 // Fitsum Family Association administrator
 const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
+ // Family gathering calendar connection
+const familyGatheringsCollection = collection(db, "familyGatherings");
+async function loadFamilyGathering(monthKey) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    const member = await getDoc(doc(db, "approvedMembers", user.uid));
+
+    if (!isCalendarAdmin(user) &&
+        !(member.exists() && member.data().approved === true)) {
+      return;
+    }
+
+    const gathering = await getDoc(doc(db, "familyGatherings", monthKey));
+
+    if (
+  gathering.exists() &&
+  auth.currentUser?.uid === user.uid
+) {
+  window.updateFamilyGathering(monthKey, gathering.data());
+}
+  } catch (error) {
+    console.error("Could not load family gathering:", error);
+  }
+}
+window.loadSelectedFamilyGathering = function() {
+  const monthKey = calendarYear + "-" +
+    String(calendarMonth + 1).padStart(2, "0");
+
+  loadFamilyGathering(monthKey);
+};
+
+function isCalendarAdmin(user) {
+  return !!user && user.uid === FAMILY_ADMIN_UID;
+}  
+   const gatheringSaveButton = document.getElementById("saveGathering");
+
+if (gatheringSaveButton) {
+  gatheringSaveButton.addEventListener("click", async () => {
+    const user = auth.currentUser;
+
+    if (!isCalendarAdmin(user)) {
+      alert("Only the family administrator can save changes.");
+      return;
+    }
+
+    const monthKey = calendarYear + "-" +
+      String(calendarMonth + 1).padStart(2, "0");
+
+    const date = document.getElementById("hostDate").value;
+    const time = document.getElementById("hostTime").value;
+    const host = document.getElementById("hostFamily").value;
+    const status = document.getElementById("gatheringSaveStatus");
+
+    if (!date.startsWith(monthKey + "-") || !time || !host) {
+      status.textContent = "Please select a valid date, time, and hosting family.";
+      return;
+    }
+
+    gatheringSaveButton.disabled = true;
+    status.textContent = "Saving...";
+
+    try {
+      await setDoc(doc(db, "familyGatherings", monthKey), {
+        date, time, host
+      });
+
+      window.updateFamilyGathering(monthKey, { date, time, host });
+      status.textContent = "Gathering saved successfully!";
+    } catch (error) {
+      status.textContent = "Save failed: " + error.message;
+    } finally {
+      gatheringSaveButton.disabled = false;
+    }
+  });
+}
+ // Check calendar administrator when Google sign-in changes
+window.familyCalendarAdmin = false;
+
+onAuthStateChanged(auth, async (user) => {
+  window.familyCalendarAdmin = isCalendarAdmin(user);
+  if (!user) {
+  Object.keys(familyMeetingSchedule).forEach(
+    key => delete familyMeetingSchedule[key]
+  );
+  drawFamilyCalendar();
+}
+  const familyCalendar = document.getElementById("family-calendar");
+
+if (familyCalendar) {
+  familyCalendar.hidden = true;
+  familyCalendar.style.display = "none";
+}
+
+let calendarApproved = window.familyCalendarAdmin;
+
+if (user && !calendarApproved) {
+  try {
+    const memberDoc = await getDoc(
+      doc(db, "approvedMembers", user.uid)
+    );
+
+    calendarApproved =
+      memberDoc.exists() &&
+      memberDoc.data().approved === true;
+  } catch (error) {
+    console.error("Calendar membership check failed:", error);
+  }
+}
+
+if (familyCalendar && calendarApproved) {
+  familyCalendar.hidden = false;
+  familyCalendar.style.display = "block";
+}
+if (user && calendarApproved) {
+  const monthKey = calendarYear + "-" +
+    String(calendarMonth + 1).padStart(2, "0");
+
+  loadFamilyGathering(monthKey);
+}
+  const saveButton = document.getElementById("saveGathering");
+  if (saveButton) {
+    saveButton.hidden = !window.familyCalendarAdmin;
+  }
+
+  drawFamilyCalendar();
+});
+
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
 // MEMBERS-ONLY FAMILY ANNOUNCEMENTS
  
@@ -1240,7 +1382,7 @@ const memberAnnouncementStatus = document.getElementById("memberAnnouncementStat
 if (memberAnnouncementLogin) {
   memberAnnouncementLogin.addEventListener("click", async () => {
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+    await signInWithPopup(auth, new GoogleAuthProvider());
     } catch (error) {
       document.getElementById("memberAnnouncementStatus").textContent =
         "Sign-in failed: " + error.message;
