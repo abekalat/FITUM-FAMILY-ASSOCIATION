@@ -832,6 +832,13 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
 
       <p>Sign in as an approved member to submit your biography.</p>
     </div>
+    
+<!-- APPROVED MEMBER BIOGRAPHIES -->
+<div id="approvedBiographies" hidden style="margin-top:35px;">
+  <h3>Our Family Stories / የቤተሰብ ታሪኮች</h3>
+  <div id="biographyList"></div>
+</div>
+
   </div>
 </section>
 <section id="family-tree" style="padding:45px 20px;background:#fffaf0;text-align:center;">
@@ -1286,6 +1293,70 @@ const memberBiographiesCollection = collection(db, "memberBiographies");
 const biographyForm = document.getElementById("biographyForm");
 const biographySection = document.getElementById("member-biographies");
 const biographyStatus = document.getElementById("biographyStatus");
+  
+async function loadApprovedBiographies() {
+  const section = document.getElementById("approvedBiographies");
+  const list = document.getElementById("biographyList");
+  const user = auth.currentUser;
+
+  if (!section || !list) return;
+
+  section.hidden = true;
+  list.replaceChildren();
+
+  if (!user) return;
+
+  try {
+    const memberDoc = await getDoc(
+      doc(db, "approvedMembers", user.uid)
+    );
+
+    const allowed = isCalendarAdmin(user) ||
+      (memberDoc.exists() && memberDoc.data().approved === true);
+
+    if (!allowed || auth.currentUser?.uid !== user.uid) return;
+
+    const biographies = await getDocs(
+      query(
+        memberBiographiesCollection,
+        where("status", "==", "approved")
+      )
+    );
+
+    if (auth.currentUser?.uid !== user.uid) return;
+
+    section.hidden = false;
+
+    if (biographies.empty) {
+      list.textContent = "No approved biographies yet.";
+      return;
+    }
+
+    biographies.forEach((entry) => {
+      const bio = entry.data();
+
+      const card = document.createElement("article");
+      card.style.cssText =
+        "padding:18px;margin:15px 0;border:1px solid #c7a45b;border-radius:10px;background:#fffaf0;";
+
+      const name = document.createElement("h4");
+      name.textContent = bio.name || "Family Member";
+
+      const relationship = document.createElement("p");
+      relationship.textContent = bio.relationship || "";
+
+      const story = document.createElement("p");
+      story.textContent = bio.story || "";
+      story.style.whiteSpace = "pre-wrap";
+
+      card.append(name, relationship, story);
+      list.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Could not load biographies:", error);
+  }
+}
+ 
 
 async function loadFamilyGathering(monthKey) {
   const user = auth.currentUser;
@@ -1421,7 +1492,8 @@ if (user && calendarApproved) {
   }
 
   drawFamilyCalendar();
-  
+  await loadApprovedBiographies();
+});
 if (biographyForm) {
   biographyForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1475,7 +1547,7 @@ if (biographyForm) {
   });
 }
 
-});
+
 
 const MEMBERSHIP_NOTIFICATION_EMAIL = "abe8302000@yahoo.com";
 // MEMBERS-ONLY FAMILY ANNOUNCEMENTS
