@@ -1026,6 +1026,30 @@ src="thumbnail_Screenshot_20250902-221047.Facebook.png"
     Please verify the recipient before sending payment.
   </p>
 </div>
+  
+<div id="zelleConfirmation" style="max-width:450px;margin:25px auto;padding:25px;background:#fffaf0;border:1px solid #c7a45b;border-radius:12px;">
+  <h3>Zelle Contribution Confirmation</h3>
+  <p>የዜል መዋጮ ማረጋገጫ</p>
+  <p>Report your payment for treasurer verification.</p>
+
+  <form id="zelleConfirmationForm">
+    <label for="zelleMemberName">Full Name</label>
+    <input id="zelleMemberName" type="text" maxlength="100" required style="display:block;width:100%;margin:8px 0 15px;padding:10px;">
+
+    <label for="zelleAmount">Contribution Amount ($)</label>
+    <input id="zelleAmount" type="number" min="0.01" step="0.01" required style="display:block;width:100%;margin:8px 0 15px;padding:10px;">
+
+    <label for="zellePaymentDate">Payment Date</label>
+    <input id="zellePaymentDate" type="date" required style="display:block;width:100%;margin:8px 0 15px;padding:10px;">
+
+    <label for="zelleNote">Note (optional)</label>
+    <textarea id="zelleNote" maxlength="500" rows="3" style="display:block;width:100%;margin:8px 0 15px;padding:10px;"></textarea>
+
+    <button type="submit">Submit Confirmation</button>
+    <p id="zelleConfirmationStatus" role="status"></p>
+  </form>
+</div>
+
 <section class="section" id="contact"><div class="wrap"><div class="section-head"><div class="eyebrow" data-en="Let's keep in touch" data-am="በግንኙነት እንቆይ">Let's keep in touch</div><h2 data-en="Contact the Association" data-am="ማህበሩን ያነጋግሩ">Contact the Association</h2><p data-en="Add the official association email, phone number, and mailing address before publishing." data-am="ከማተምዎ በፊት ይፋዊ የማህበሩን ኢሜይል፣ ስልክ ቁጥር እና የፖስታ አድራሻ ያክሉ።">Add the official association email, phone number, and mailing address before publishing.</p></div><div class="notice"><strong data-en="Association contact details" data-am="የማህበሩ የመገናኛ መረጃ">Association contact details</strong><p data-en="Email: Add official email · Phone: Add official phone · Location: Add city / country" data-am="ኢሜይል፦ ይፋዊ ኢሜይል ያክሉ · ስልክ፦ ይፋዊ ስልክ ያክሉ · አድራሻ፦ ከተማ / አገር ያክሉ">Email: Add official email · Phone: Add official phone · Location: Add city / country</p></div></div></section>
 
 <section class="section white" id="memorial">
