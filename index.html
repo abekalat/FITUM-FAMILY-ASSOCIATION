@@ -1327,6 +1327,71 @@ const FAMILY_ADMIN_UID = "i9zZT7HTzzTcaQwpltUPNkuNjaN2";
 const familyGatheringsCollection = collection(db, "familyGatherings");
    
 const memberBiographiesCollection = collection(db, "memberBiographies");
+// Zelle contribution confirmations
+const zelleConfirmationsCollection = collection(db, "zelleConfirmations");
+const zelleConfirmationForm = document.getElementById("zelleConfirmationForm");
+const zelleConfirmationStatus = document.getElementById("zelleConfirmationStatus");
+   
+if (zelleConfirmationForm) {
+  zelleConfirmationForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      zelleConfirmationStatus.textContent =
+        "Please sign in with Google first.";
+      return;
+    }
+
+    const submitButton = zelleConfirmationForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    zelleConfirmationStatus.textContent = "Submitting...";
+
+    try {
+      const member = await getDoc(doc(db, "approvedMembers", user.uid));
+
+      if (!isCalendarAdmin(user) &&
+          !(member.exists() && member.data().approved === true)) {
+        zelleConfirmationStatus.textContent = "Approved members only.";
+        return;
+      }
+
+      const name = document.getElementById("zelleMemberName").value.trim();
+      const amount = Number(document.getElementById("zelleAmount").value);
+      const paymentDate = document.getElementById("zellePaymentDate").value;
+      const note = document.getElementById("zelleNote").value.trim();
+
+      if (!name || !Number.isFinite(amount) || amount <= 0 ||
+          amount > 100000 || !/^\d{4}-\d{2}-\d{2}$/.test(paymentDate)) {
+        zelleConfirmationStatus.textContent =
+          "Please enter valid contribution details.";
+        return;
+      }
+
+      await addDoc(zelleConfirmationsCollection, {
+        memberUid: user.uid,
+        name,
+        amount,
+        paymentDate,
+        note,
+        status: "pending",
+        submittedAt: serverTimestamp()
+      });
+
+      zelleConfirmationStatus.textContent =
+        "Confirmation submitted! Waiting for treasurer verification.";
+      zelleConfirmationForm.reset();
+
+    } catch (error) {
+      console.error("Zelle confirmation failed:", error);
+      zelleConfirmationStatus.textContent =
+        "Submission failed. Please try again.";
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
 
 const biographyForm = document.getElementById("biographyForm");
 const biographySection = document.getElementById("member-biographies");
