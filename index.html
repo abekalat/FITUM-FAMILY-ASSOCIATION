@@ -1514,9 +1514,14 @@ window.loadSelectedFamilyGathering = function() {
   loadFamilyGathering(monthKey);
 };
 
+
 function isCalendarAdmin(user) {
-  return !!user && user.uid === FAMILY_ADMIN_UID;
-}  
+  return !!user && (
+    user.uid === FAMILY_ADMIN_UID ||
+    user.uid === "y3PJAgwlVaULvFXzVDkGyti2tZp1"
+  );
+}
+
    const gatheringSaveButton = document.getElementById("saveGathering");
 
 if (gatheringSaveButton) {
