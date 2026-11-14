@@ -1347,6 +1347,13 @@ const zelleConfirmationsCollection = collection(db, "zelleConfirmations");
 const zelleConfirmationForm = document.getElementById("zelleConfirmationForm");
 const zelleConfirmationStatus = document.getElementById("zelleConfirmationStatus");
    
+    // Treasurer Financial Dashboard
+    const financialPaymentsCollection = collection(db, "financialPayments");
+    const adminFinancialDashboard =
+      document.getElementById("adminFinancialDashboard");
+    const financialDashboardContent =
+      document.getElementById("financialDashboardContent");
+
 if (zelleConfirmationForm) {
   zelleConfirmationForm.addEventListener("submit", async (event) => {
     event.preventDefault();
