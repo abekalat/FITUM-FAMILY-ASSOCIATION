@@ -1563,6 +1563,14 @@ window.familyCalendarAdmin = false;
 
 onAuthStateChanged(auth, async (user) => {
   window.familyCalendarAdmin = isCalendarAdmin(user);
+  
+    // Show Treasurer Dashboard only to administrators
+    if (adminFinancialDashboard) {
+      adminFinancialDashboard.hidden = !isCalendarAdmin(user);
+      adminFinancialDashboard.style.display =
+        isCalendarAdmin(user) ? "block" : "none";
+    }
+
   if (!user) {
   Object.keys(familyMeetingSchedule).forEach(
     key => delete familyMeetingSchedule[key]
