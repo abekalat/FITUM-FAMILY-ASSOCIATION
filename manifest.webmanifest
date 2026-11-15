@@ -1,0 +1,12 @@
+
+{
+  "name": "Fitsum Family Association",
+  "short_name": "Fitsum Family",
+  "description": "Official Fitsum Family Association app for family news, events, history and membership.",
+  "start_url": "/FITUM-FAMILY-ASSOCIATION/",
+  "scope": "/FITUM-FAMILY-ASSOCIATION/",
+  "display": "standalone",
+  "background_color": "#fffaf0",
+  "theme_color": "#075038",
+  "lang": "en"
+}
